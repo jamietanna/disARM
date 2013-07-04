@@ -1,0 +1,72 @@
+KMD
+00000000:             ; hanoi
+00000000:             ;                                         ; R0 holds current char
+00000000:             ;                                         ; R1 holds current 'order'
+00000000:             ;                                         ; R2 always points to letters
+00000000:             ; 
+00000000: E7D20001    ;     LDRB    R0,  [R2, R1]               ; char thisch = diskletters[order];
+00000004: E7D20181    ;     LDRB    R0,  [R2, R1, LSL #3]               ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+00000008:             ; 
+00000008: E3510001    ;     CMP     R1,  #1                     ; when we've hit the base case, 
+0000000C: 0F000000    ;     SWIEQ   0                           ;  output the character, 
+00000010: 01A0F00E    ;     MOVEQ   PC,  LR                     ;  and then we return back up the stack
+00000014:             ; 
+00000014: E92D4003    ;     STMFD   SP!, {R1,R0,LR}             ; hanoi(order-1)
+00000018: E2411001    ;     SUB     R1,  R1, #1
+0000001C: EBFFFFF7    ;     BL      hanoi
+00000020:             ; 
+00000020: E89D0003    ;     LDMFD   SP,  {R1, R0}               
+00000024:             ;                                         ; don't update SP so we can pop it again later from the
+                      ;  same place, or bother to pop LR, as we're not gonna use it
+00000024: EF000000    ;     SWI     0
+00000028:             ;     
+00000028: E2411001    ;     SUB     R1,  R1, #1                 ; hanoi(order-1)
+0000002C: EBFFFFF3    ;     BL      hanoi
+00000030: E8BD8003    ;     LDMFD   SP!, {R1,R0,PC}             ; and finally return to whence we came by sneakily load
+                      ; ing LR into PC
+00000034:             ; 
+00000034:             ; main
+00000034: E3A0DA01    ;     MOV     SP,  #stack                 
+00000038:             ;                                         ; start off our stack pointer, so it knows where to sen
+                      ; d data
+00000038: E28F2052    ;     ADR     R2,  letters                 
+0000003C:             ;                                         ; initialise the start pointer to the "array" letters
+0000003C: E28F0028    ;     ADR     R0,  message
+00000040: EF000003    ;     SWI     3
+00000044: E3A01004    ;     MOV     R1,  #order                  ; set the order from the constant
+00000048: E1A00001    ;     MOV     R0,  R1
+0000004C: EF000004    ;     SWI     4
+00000050: E28F0034    ;     ADR     R0,  spacer
+00000054: EF000003    ;     SWI     3
+00000058: EBFFFFE8    ;     BL      hanoi
+0000005C: E3A0000A    ;     MOV     R0,  #10                     ; beautify with a newline
+00000060: EF000000    ;     SWI     0
+00000064: EF000002    ;     SWI     2
+00000068:             ; 
+00000068: EAFFFFF1    ;             B main
+0000006C:             ; stack   EQU      0x1000
+0000006C:             ; order   EQU      4
+0000006C: 48 65 72 65 ; message DEFB     "Here is the sequence for hanoi(\0"
+00000070: 20 69 73 20 ; 
+00000074: 74 68 65 20 ; 
+00000078: 73 65 71 75 ; 
+0000007C: 65 6E 63 65 ; 
+00000080: 20 66 6F 72 ; 
+00000084: 20 68 61 6E ; 
+00000088: 6F 69 28 00 ; 
+0000008C: 29 3A 20 20 ; spacer  DEFB     "):   \0"
+00000090: 20 00       ; 
+00000092: 20 41 42 43 ; letters DEFB     " ABCDE\0"
+00000096: 44 45 00    ; 
+0000009C:             ;         ALIGN
+0000009C:             ; 
+0000009C:             ; 
+
+Symbol Table: Labels
+: hanoi                             00000000  Local -- ARM
+: main                              00000034  Local -- ARM
+: stack                             00001000  Value
+: order                             00000004  Value
+: message                           0000006C  Local -- ARM
+: spacer                            0000008C  Local -- ARM
+: letters                           00000092  Local -- ARM

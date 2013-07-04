@@ -1,0 +1,90 @@
+KMD
+00000000:             ; badinput
+00000000: E28F009A    ;         ADR     R0, strBadInput
+00000004: EF000003    ;         SWI     3
+00000008: EF000002    ;         SWI     2        
+0000000C:             ;         
+0000000C:             ; rem     
+0000000C: E0500001    ;         SUBS    R0, R0, R1
+00000010: CAFFFFFD    ;         BGT     rem
+00000014: B0800001    ;         ADDLT   R0, R0, R1              
+00000018:             ;                                         ; no point doing a CMP before to check if R3>R4, ineffi
+                      ; cient in the grand scale of things
+00000018: E1A0F00E    ;         MOV     PC, LR
+0000001C:             ; 
+0000001C:             ; gcd        
+0000001C: E92D4000    ;         STMFD   SP!, {LR}             
+00000020:             ;                                         ; only store this the first time we enter the function,
+                      ;  as then we don't need a load of MOV PC, LR etc to return to the main code, it's a single one
+00000020:             ; gcdloop
+00000020: EBFFFFF9    ;         BL      rem
+00000024: E1A03000    ;         MOV R3, R0
+00000028: E1A00001    ;         MOV R0, R1                      ; value of (y)
+0000002C: E1A01003    ;         MOV R1, R3                      ; value of (x % y)
+00000030: 1AFFFFFA    ;         BNE     gcdloop                 
+00000034:             ;                                         ; keep going if we have (R3!=0) from remloop
+00000034: E8BD8000    ;         LDMFD   SP!, {PC}               
+00000038:             ;                                         ; finally return to the main program body
+00000038:             ; main                                    
+00000038:             ;                                         ; code can be done in 8 less cycles without the nicer o
+                      ; utput
+00000038: E3A0DA01    ;         MOV     SP, #stack    
+0000003C: E28F0054    ;         ADR     R0, result1
+00000040: EF000003    ;         SWI     3                       ; put out the string 
+00000044: E59F0070    ;         LDR     R0, =input1
+00000048: EF000004    ;         SWI     4
+0000004C: E3A0002C    ;         MOV     R0, #','
+00000050: EF000000    ;         SWI     0
+00000054: E3A0006F    ;         LDR     R0, =input2
+00000058: EF000004    ;         SWI     4
+0000005C:             ;         
+0000005C: E1A01000    ;         MOV     R1, R0                  ; backup so don't need to do another LDR
+00000060:             ;         
+00000060: E28F0035    ;         ADR     R0, result2
+00000064: EF000003    ;         SWI     3                       ; put out the string 
+00000068:             ;         
+00000068: E59F004C    ;         LDR     R0, =input1 ;;;;;;;;;;;;;;;; why = not # ??? - large numbs
+0000006C:             ;                                         ; only check once, instead of after each execution
+0000006C: E1500001    ;         CMP     R0, R1
+00000070: A3500000    ;         CMPGE   R0, #0                  ; cut down another branch
+00000074: BAFFFFE1    ;         BLT     badinput
+00000078: E3510000    ;         CMP     R1, #0
+0000007C: DAFFFFDF    ;         BLE     badinput
+00000080:             ;         
+00000080: EBFFFFE5    ;         BL      gcd
+00000084: EF000004    ;         SWI     4                       ; gcd's result is returned in R0
+00000088: E3A0000A    ;         MOV     R0, #10
+0000008C: EF000000    ;         SWI     0
+00000090: EF000002    ;         SWI     2
+00000094: EAFFFFE7    ;                 B main
+00000098:             ; stack           EQU         0x1000
+00000098:             ; input1          EQU         259;91
+00000098:             ; input2          EQU         111;26
+00000098: 47 43 44 28 ; result1         DEFB        "GCD(\0"
+0000009C: 00          ; 
+0000009D: 29 20 3D 20 ; result2         DEFB        ") = \0"
+000000A1: 00          ; 
+000000A2: 45 72 72 6F ; strBadInput     DEFB        "Error, bad input to [rem]\0"
+000000A6: 72 2C 20 62 ; 
+000000AA: 61 64 20 69 ; 
+000000AE: 6E 70 75 74 ; 
+000000B2: 20 74 6F 20 ; 
+000000B6: 5B 72 65 6D ; 
+000000BA: 5D 00       ; 
+000000BC:             ;                 ALIGN
+000000BC:             ; 
+000000BC:             ; 
+000000BC: 00000103    ; Remaining literals
+
+Symbol Table: Labels
+: badinput                          00000000  Local -- ARM
+: rem                               0000000C  Local -- ARM
+: gcd                               0000001C  Local -- ARM
+: gcdloop                           00000020  Local -- ARM
+: main                              00000038  Local -- ARM
+: stack                             00001000  Value
+: input1                            00000103  Value
+: input2                            0000006F  Value
+: result1                           00000098  Local -- ARM
+: result2                           0000009D  Local -- ARM
+: strBadInput                       000000A2  Local -- ARM

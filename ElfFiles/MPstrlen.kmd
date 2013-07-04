@@ -1,0 +1,43 @@
+KMD
+00000000:             ; ; Framework for strlen question
+00000000:             ; 
+00000000: EA000011    ;         B main
+00000004:             ; ; you'll need a few more string declarations here to get the answer `looking right'.
+00000004: 48 65 6C 6C ; text1   DEFB    "Hello World. Goodbye Universe\0"
+00000008: 6F 20 57 6F ; 
+0000000C: 72 6C 64 2E ; 
+00000010: 20 47 6F 6F ; 
+00000014: 64 62 79 65 ; 
+00000018: 20 55 6E 69 ; 
+0000001C: 76 65 72 73 ; 
+00000020: 65 00       ; 
+00000022: 31 32 33 34 ; text2   DEFB    "1234567890 are the ten decimal digits\0"
+00000026: 35 36 37 38 ; 
+0000002A: 39 30 20 61 ; 
+0000002E: 72 65 20 74 ; 
+00000032: 68 65 20 74 ; 
+00000036: 65 6E 20 64 ; 
+0000003A: 65 63 69 6D ; 
+0000003E: 61 6C 20 64 ; 
+00000042: 69 67 69 74 ; 
+00000046: 73 00       ; 
+00000048: 00          ; nulltxt DEFB    "\0"
+0000004C:             ;         ALIGN
+0000004C:             ; 
+0000004C: E24F0050    ; main    ADR R0, text1   ; get address of starting byte of string
+00000050: E3A02000    ;         MOV R2, #0      ; Initialise the counter in Register 2 
+00000054: E5501000    ; again   LDRB R1, [R0]   ; this loads into r1 the byte whose address is currently in R0
+00000058:             ;                         ; Replace this comment with your own code to check that the contents 
+00000058:             ;                         ; of R1 are not the null byte. If R1 is not null then you need to 
+00000058:             ;                         ; increment both  the count and the byte address and branch back to 
+00000058:             ;                         ; label `again'. If the null byte HAS been encountered then print out
+00000058:             ;                         ;  the answer in the form stipulated by the question.
+00000058:             ; 
+00000058:             ; 
+
+Symbol Table: Labels
+: text1                             00000004  Local -- ARM
+: text2                             00000022  Local -- ARM
+: nulltxt                           00000048  Local -- ARM
+: main                              0000004C  Local -- ARM
+: again                             00000054  Local -- ARM
